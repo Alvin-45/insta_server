@@ -263,10 +263,10 @@ exports.removeFriend = async (req, res) => {
 
 exports.luserdetail = async (req, res) => {
     console.log("Inside luser friend");
-    const {userName}=sessionStorage.getItem('existingUser')
-    console.log(_id);
+    const userId=req.payload
+    console.log(userId);
     try {
-        const currentUser = await users.findOne({ userName });
+        const currentUser = await users.findOne({_id:userId});
         console.log(currentUser);
         res.status(200).json(currentUser);
     } catch (err) {
@@ -287,3 +287,39 @@ exports.editProfile=async(req,res)=>{
     }
 }
 
+// exports.friendcount=async(req,res)=>{
+//     console.log('Inside frnt count');
+//     const userId=req.payload
+//     console.log(userId);
+//     let username=null
+//     try {
+//         const user=await users.findById(userId)
+//         username=user.username
+        
+//         const friendlist=await users.friends.find({fid:userId})
+//         console.log(friendlist);
+//         res.status(200).json(friendlist)
+//     } catch (err) {
+//         res.status(500).json(err)
+//     }
+// }
+
+exports.friendcount = async (req, res) => {
+    // console.log('Inside friend count');
+    const userId = req.payload;
+    // console.log(userId);
+    let username = null;
+    try {
+        const user = await users.findById(userId);
+        username = user.username;
+
+        const friendList = await users.aggregate([
+            { $match: { friends: { $elemMatch: { fid: userId, fname: username } } } }
+        ]);
+
+        // console.log(friendList);
+        res.status(200).json(friendList);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+};

@@ -96,12 +96,12 @@ exports.addflagPost = async (req, res) => {
 
 
 exports.getAllPosts = async (req,res)=>{
-    console.log('Inside get all post request!!!');
+    // console.log('Inside get all post request!!!');
     const userId = req.payload
     try{
         const userPosts = await posts.find({userId})
         res.status(200).json(userPosts)
-        console.log(userPosts);
+        // console.log(userPosts);
 
     }catch(err){
         res.status(401).json(err)
@@ -122,7 +122,7 @@ exports.getAllPosts = async (req,res)=>{
 // }
 
 exports.getHomePosts = async (req, res) => {
-    console.log('Inside get all post request!!!');
+    // console.log('Inside get all post request!!!');
     try {
       const allPosts = await posts.find().populate('userId', 'username'); 
       res.status(200).json(allPosts);

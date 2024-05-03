@@ -89,4 +89,6 @@ router.put("/edit-comment/:cid",jwtMiddleware,commentControler.editComment)
 
 router.get('/isfav/:pid',jwtMiddleware,postController.isfav)
 
+router.get('/frndcount',jwtMiddleware,userController.friendcount)
+
 module.exports = router
