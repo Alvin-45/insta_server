@@ -29,6 +29,8 @@ router.post("/admin-post",jwtMiddleware,multerConfig.single('image'),postControl
 
 router.post("/flag-post/:pid/:pc",jwtMiddleware,postController.addflagPost)
 
+router.post("/fav-post/:pu/:pc",jwtMiddleware,postController.addfavPost)
+
 router.post('/add-comment/:pid',jwtMiddleware,commentControler.addcommentsAPI)
 
 router.post('/add-admindeleted/:poster/:postId/:postCaption/:reporter',jwtMiddleware,commentControler.addcommentsAPI)
@@ -60,10 +62,13 @@ router.get("/frienddetails/:uid",userController.allfrienddetails)
 
 router.delete("/remove-post/:pid",jwtMiddleware,postController.removePost)
 
+router.delete("/remove-fav/:pid",jwtMiddleware,postController.removefav)
+
 router.delete("/remove-flag/:pid",jwtMiddleware,adminController.removeflag)
 
 router.delete("/remove-friend/:fid",jwtMiddleware,userController.removeFriend)
 
+router.delete("/remove-comment/:cid",jwtMiddleware,commentControler.dltcomment)
 
 //chat part
 router.post('/add-chat/:rid/:sid',jwtMiddleware,chatController.addchatsAPI)
@@ -78,5 +83,10 @@ router.post('/manage-likes:pid',jwtMiddleware,postController.managelikes)
 
 router.get('/doespostexist/:pid', jwtMiddleware, postController.doespostexist);
 
+router.post('/flag-comment/:pid/:cid',jwtMiddleware,commentControler.addflagComment)
+
+router.put("/edit-comment/:cid",jwtMiddleware,commentControler.editComment)
+
+router.get('/isfav/:pid',jwtMiddleware,postController.isfav)
 
 module.exports = router
