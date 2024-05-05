@@ -5,6 +5,7 @@ const users = require('../Model/userModel');
 const flags=require('../Model/flagModel')
 const admindeleted=require('../Model/admindeletedmodel')
 const flagcomment=require('../Model/flagcomment')
+const Favouriteup=require('../Model/FavUpdatedModel')
 
 exports.register = async (req, res) => {
     console.log("Inside Register Function");

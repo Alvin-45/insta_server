@@ -3,6 +3,10 @@ const friends = require('../Model/friendModel');
 const posts = require('../Model/postModel');
 const users = require('../Model/userModel')
 const jwt = require('jsonwebtoken')
+const Favouriteup=require('../Model/FavUpdatedModel')
+const admins = require('../Model/adminModel')
+const flags=require('../Model/flagModel')
+const flagscomments = require('../Model/flagcomment')
 
 exports.register = async (req, res) => {
     console.log("Inside Register Function");
@@ -347,10 +351,25 @@ exports.editProfile = async (req, res) => {
             { userId: userId },
             { $set: { username: username } }
         );
+//fav fav owner
+        const updatedFavposts = await Favouriteup.updateMany(
+            { userId: userId },
+            { $set: { username: username } }
+        );
+//fav post owner
+        const updatedFavposters = await Favouriteup.updateMany(
+            { posterId: userId },
+            { $set: { poster: username } }
+        );
 
         const updatedComments = await comments.updateMany(
             { userId: userId },
             { $set: { username: username } }
+        );
+
+        const updatedFriends = await users.friends.updateMany(
+            { fid: userId },
+            { $set: { fname: username } }
         );
         // Update user model
         const updatedProfile = await users.findByIdAndUpdate(
