@@ -4,7 +4,7 @@ const posts = require('../Model/postModel');
 const users = require('../Model/userModel');
 const flags=require('../Model/flagModel')
 const admindeleted=require('../Model/admindeletedmodel')
-
+const flagcomment=require('../Model/flagcomment')
 
 exports.register = async (req, res) => {
     console.log("Inside Register Function");
@@ -96,3 +96,14 @@ exports.deletedposts = async (req, res) => {
         res.status(500).json({ error: "Failed to save deleted post ." });
     }
 };
+
+exports.removecmtflag=async(req,res)=>{
+    console.log("Inside Remove cmt flag");
+    const {cid}=req.params;
+    try {
+        const postDetails=await flagcomment.findOneAndDelete({commentId:cid})
+        res.status(200).json(postDetails)
+    } catch (err) {
+        res.status(401).json(err)
+    }
+}

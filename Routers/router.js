@@ -29,7 +29,7 @@ router.post("/admin-post",jwtMiddleware,multerConfig.single('image'),postControl
 
 router.post("/flag-post/:pid/:pc",jwtMiddleware,postController.addflagPost)
 
-router.post("/fav-post/:pu/:pc",jwtMiddleware,postController.addfavPost)
+router.post("/fav-post",jwtMiddleware,postController.addfavPost)
 
 router.post('/add-comment/:pid',jwtMiddleware,commentControler.addcommentsAPI)
 
@@ -66,6 +66,8 @@ router.delete("/remove-fav/:pid",jwtMiddleware,postController.removefav)
 
 router.delete("/remove-flag/:pid",jwtMiddleware,adminController.removeflag)
 
+router.delete("/remove-cmtflag/:cid",jwtMiddleware,adminController.removecmtflag)
+
 router.delete("/remove-friend/:fid",jwtMiddleware,userController.removeFriend)
 
 router.delete("/remove-comment/:cid",jwtMiddleware,commentControler.dltcomment)
@@ -75,7 +77,7 @@ router.post('/add-chat/:rid/:sid',jwtMiddleware,chatController.addchatsAPI)
 
 router.get('/get-chats/:receiver/:sender', jwtMiddleware, chatController.getAllChats);
 
-router.put("/edit-profile/",jwtMiddleware,multerConfig.single('profileimage'),userController.editProfile)
+router.put("/edit-profile",jwtMiddleware,userController.editProfile);
 
 router.get("/adminsearch-post/:pid",jwtMiddleware,postController.adminUserPosts)
 
@@ -90,5 +92,10 @@ router.put("/edit-comment/:cid",jwtMiddleware,commentControler.editComment)
 router.get('/isfav/:pid',jwtMiddleware,postController.isfav)
 
 router.get('/frndcount',jwtMiddleware,userController.friendcount)
+
+router.get('/getallfav',jwtMiddleware,multerConfig.single('profileimage'),postController.getAllfav)
+
+router.get('/getflagcmt',jwtMiddleware,commentControler.getflagComment)
+
 
 module.exports = router

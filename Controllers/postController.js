@@ -4,6 +4,7 @@ const admins = require('../Model/adminModel')
 const flags=require('../Model/flagModel')
 const like=require('../Model/likeModel')
 const favourite=require('../Model/favouriteModel')
+const Favouriteup=require('../Model/FavUpdatedModel')
 
 exports.addPost = async (req, res) => {
     console.log("Inside Add Post Request");
@@ -152,6 +153,7 @@ exports.removePost=async(req,res)=>{
     const {pid}=req.params;
     try {
         const postDetails=await posts.findByIdAndDelete({_id:pid})
+        console.log(postDetails);
         res.status(200).json(postDetails)
     } catch (err) {
         res.status(401).json(err)
@@ -242,35 +244,36 @@ exports.doespostexist=async (req,res)=>{
     }
 }
 
-//favworking on
+//success
 exports.addfavPost = async (req, res) => {
     console.log("Inside Add favourite Request");
-    console.log(req.payload);
     console.log(req.body);
-    console.log(req.params);
-    const poster  = req.body.poster;
-    const postId=req.params.pu;
-    const postCaption=req.params.pc;
+    const {poster,postId,postCaption,postImage}  = req.body;
+    console.log(poster);
+    console.log(postId);
+    console.log(postCaption);
+    console.log(postImage);
+
     const userId = req.payload;
     let username = null;
+    let posterId=null
     try {
+        console.log('Indide try looooop');
         const user = await users.findById(userId);
-        if (user) {
-            
-            username=user.username //whos fav list
-
-            const newFavourite = new favourite({
-                username, poster, postId, postCaption
+        const post=await posts.findById(postId)
+            username=user.username 
+            console.log(username);
+            posterId=post.userId
+            const newFavourite = new Favouriteup({
+                userId,username,posterId, poster, postId, postCaption,postImage
             });
             console.log(newFavourite);
-            await newFavourite.save(); 
+            await newFavourite.save();  
             console.log("Favourite saved successfully");
             res.status(200).json(newFavourite); 
-        } else {
-            
-            res.status(404).json({ error: 'User not found' });
-        }
+        
     } catch (err) {
+        console.log('errroooorrrr');
         res.status(500).json({ error: 'Internal Server Error(flag)' });
     }
 }
@@ -291,7 +294,7 @@ exports.isfav=async(req,res)=>{
     try {
         const user=await users.findOne(userId)
         username=user.username
-        const allFav=await favourite.find({username:username})
+        const allFav=await Favouriteup.find({username:username})
         console.log(allFav);
         res.status(200).json(allFav)
     } catch (err) {
@@ -299,13 +302,32 @@ exports.isfav=async(req,res)=>{
     }
 }
 
+exports.getAllfav = async (req,res)=>{
+    console.log('Inside get all fav request!!!');
+    const userId = req.payload
+    let username=null
+    try{
+        const user=await users.findOne({_id:userId})
+        username=user.username
+        const userPosts = await Favouriteup.find({username:username})
+        res.status(200).json(userPosts)
+        // console.log(userPosts);
+
+    }catch(err){
+        res.status(401).json(err)
+    }
+}
+
 //working on
 exports.removefav=async(req,res)=>{
     console.log("Inside Remove fav");
+    console.log(req.params);
     const {pid}=req.params;
     try {
-        const postDetails=await favourite.findByIdAndDelete({postId:pid})
+        console.log('Inside try');
+        const postDetails=await Favouriteup.findOneAndDelete({postId:pid})
         res.status(200).json(postDetails)
+        console.log("success");
     } catch (err) {
         res.status(401).json(err)
     }

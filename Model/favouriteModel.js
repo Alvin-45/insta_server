@@ -11,9 +11,14 @@ const favSchema = new mongoose.Schema({
   },
   postId: {
     type: String,
-    required: true
+    required: true,
+    unique:true
   },
   postCaption:{
+    type:String,
+    required:true
+  },
+  postImage:{
     type:String,
     required:true
   }

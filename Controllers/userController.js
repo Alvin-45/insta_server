@@ -1,3 +1,6 @@
+const comments = require('../Model/commentModel');
+const friends = require('../Model/friendModel');
+const posts = require('../Model/postModel');
 const users = require('../Model/userModel')
 const jwt = require('jsonwebtoken')
 
@@ -273,19 +276,7 @@ exports.luserdetail = async (req, res) => {
         res.status(401).json(err);
     }
 }
-exports.editProfile=async(req,res)=>{
-    console.log("Inside edit profile");
-    const userId=req.payload
-    const {firstName,email,username,profileImage} = req.body
-    const uploadImage=req.file?req.file.filename:profileImage
-    try {
-        const updatedProfile=await users.findByIdAndUpdate({_id:userId},{firstName,email,username,profileImage:uploadImage,userId},{new:true})
-        await updatedProfile.save()
-        res.status(200).json(updatedProfile)
-    } catch (err) {
-        res.status(401).json(err)
-    }
-}
+
 
 // exports.friendcount=async(req,res)=>{
 //     console.log('Inside frnt count');
@@ -321,5 +312,57 @@ exports.friendcount = async (req, res) => {
         res.status(200).json(friendList);
     } catch (err) {
         res.status(500).json(err);
+    }
+};
+
+// exports.editProfile=async(req,res)=>{
+//     console.log('Inside edit Profile');
+//     const userId=req.payload
+//     console.log(req.body);
+//     const {firstName,email,username,password,friends} = req.body
+    
+
+//     // const uploadImage=req.file?req.file.filename:projectImage
+//     try { 
+//         const updatedProfile=await users.findByIdAndUpdate({_id:userId},{firstName, email, username, password, friends },{new:true})
+
+//         console.log('inside success');
+//         res.status(200).json(updatedProfile)
+//     } catch (err) {
+//         console.log('faile');
+//         res.status(401).json(err)
+//     }
+// }
+exports.editProfile = async (req, res) => {
+    console.log('Inside edit Profile');
+    const userId = req.payload;
+    console.log(req.body);
+    const { firstName, email, username, password, friends } = req.body;
+    let previousUsername=null
+
+    try {
+        
+        // Update posts where userId matches
+        const updatedPosts = await posts.updateMany(
+            { userId: userId },
+            { $set: { username: username } }
+        );
+
+        const updatedComments = await comments.updateMany(
+            { userId: userId },
+            { $set: { username: username } }
+        );
+        // Update user model
+        const updatedProfile = await users.findByIdAndUpdate(
+            { _id: userId },
+            { firstName, email, username, password, friends },
+            { new: true }
+        );
+
+        console.log('Inside success');
+        res.status(200).json(updatedProfile);
+    } catch (err) {
+        console.log('Failed');
+        res.status(401).json(err);
     }
 };
