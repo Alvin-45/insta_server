@@ -16,6 +16,14 @@ const flagSchema = new mongoose.Schema({
   postCaption:{
     type:String,
     required:true
+  },
+  posterId: {
+    type: String,
+    required: true
+  },
+  reporterId: {
+    type: String,
+    required: true,
   }
 });
 

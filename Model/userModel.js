@@ -21,7 +21,8 @@ const userSchema = new mongoose.Schema({
   friends: [
     {
       fid: { type: String },
-      fname: { type: String }
+      fname: { type: String },
+      fimg:{ type: String }
     }
   ],
   profileImage:{
@@ -29,6 +30,6 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-const User = mongoose.model('User', userSchema);
+const users = mongoose.model('users', userSchema);
 
-module.exports = User;
+module.exports = users;

@@ -14,13 +14,15 @@ exports.addPost = async (req, res) => {
     const { caption } = req.body;
     const userId = req.payload;
     const image = req.file.filename;
+    let profileImage=null
     let username = null;
     try {
         const user = await users.findById(userId);
         if (user) {
             username = user.username;
+            profileImage=user.profileImage
             const newPost = new posts({
-                image, caption, userId, username
+                image, caption, userId, username,profileImage
             });
             await newPost.save(); 
             res.status(200).json(newPost); 
@@ -65,22 +67,28 @@ exports.addflagPost = async (req, res) => {
     console.log(req.payload);
     console.log(req.body);
     console.log(req.params);
-    const posterid  = req.body.userId;
+    const posterId  = req.body.userId;
     const postId=req.params.pid;
     const postCaption=req.params.pc;
-    const reporterid = req.payload;
+    const reporterId = req.payload;
     let poster = null;
     let reporter = null;
 
     try {
-        const user = await users.findById(posterid);
-        const user2 = await users.findById(reporterid);
+        const user = await users.findById(posterId);
+        const user2 = await users.findById(reporterId);
         if (user && user2) {
+            console.log('exist');
             poster = user.username;
-            
+            console.log(poster);
             reporter=user2.username
+            console.log(reporter);
             const newflag = new flags({
-                poster, reporter, postId, postCaption
+                poster,
+                reporter,
+                postId, postCaption,
+                posterId,
+                reporterId,
             });
             console.log(newflag);
             await newflag.save(); 

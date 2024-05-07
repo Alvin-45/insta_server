@@ -16,12 +16,16 @@ const postSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    profileImage:{
+        type:String
+      },
     likes: [
         {
           lid: { type: String },
           lname: { type: String }
         }
-      ]
+      ],
+      
 })
 
 const posts = mongoose.model("posts",postSchema)

@@ -1,0 +1,66 @@
+exports.editProfile = async (req, res) => {
+    console.log('Inside edit Profile');
+    const userId = req.payload;
+    console.log(req.body);
+    const { firstName, email, username, password } = req.body;
+    const {friends}=req.params
+    console.log(friends);
+    const profileImage=req.file.filename
+    console.log(profileImage);
+    
+
+    try {
+        
+        // Update posts where userId matches
+        const updatedPosts = await posts.updateMany(
+            { userId: userId },
+            { $set: { username: username } }
+        );
+        const updatedPostpimgs = await posts.updateMany(
+            { userId: userId },
+            { $set: { profileImage: profileImage } }
+        );
+
+        const updatedProfilepic = await users.updateMany(
+            { _id: userId },
+            { $set: { profileImage: profileImage } }
+        );
+
+//fav fav owner
+        const updatedFavposts = await Favouriteup.updateMany(
+            { userId: userId },
+            { $set: { username: username } }
+        );
+        
+//fav post owner
+        const updatedFavposters = await Favouriteup.updateMany(
+            { posterId: userId },
+            { $set: { poster: username } }
+        );
+
+        const updatedComments = await comments.updateMany(
+            { userId: userId },
+            { $set: { username: username } }
+        );
+
+        const updatedFriends = await users.updateMany(
+            { 'friends.fid': userId },
+            { $set: { 'friends.$.fname': username } }
+        );
+        console.log('success');
+
+
+        // Update user model
+        const updatedProfile = await users.findByIdAndUpdate(
+            { _id: userId },
+            { firstName, username, password, friends },
+            { new: true }
+        );
+
+        console.log('Inside success');
+        res.status(200).json(updatedProfile);
+    } catch (err) {
+        console.log('Failed');
+        res.status(401).json(err);
+    }
+};

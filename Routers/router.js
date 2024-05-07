@@ -97,5 +97,7 @@ router.get('/getallfav',jwtMiddleware,multerConfig.single('profileimage'),postCo
 
 router.get('/getflagcmt',jwtMiddleware,commentControler.getflagComment)
 
+router.put("/profile-pic",jwtMiddleware,multerConfig.single('profileImage'),userController.updateprofilepic)
+
 
 module.exports = router

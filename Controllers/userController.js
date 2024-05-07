@@ -8,6 +8,31 @@ const admins = require('../Model/adminModel')
 const flags=require('../Model/flagModel')
 const flagscomments = require('../Model/flagcomment')
 
+// exports.register = async (req, res) => {
+//     console.log("Inside Register Function");
+//     const { firstName, email, username, password } = req.body
+//     console.log(firstName, email, username, password);
+//     try {
+//         const existingUser = await users.findOne({ username });
+//         if (existingUser) {
+//             res.status(406).json("User Already exist!!!")
+//         } else {
+//             const newUser = new users({
+//                 firstName,
+//                 email,
+//                 username,
+//                 password
+//             })
+//             await newUser.save()
+//             res.status(200).json(newUser)
+//         }
+
+//     } catch (err) {
+//         res.status(401).json(err)
+
+//     }
+// }
+
 exports.register = async (req, res) => {
     console.log("Inside Register Function");
     const { firstName, email, username, password } = req.body
@@ -23,8 +48,9 @@ exports.register = async (req, res) => {
                 username,
                 password
             })
-            await newUser.save()
-            res.status(200).json(newUser)
+            await newUser.save();
+            const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET)
+            res.status(200).json({token})
         }
 
     } catch (err) {
@@ -32,6 +58,7 @@ exports.register = async (req, res) => {
 
     }
 }
+
 exports.login = async (req, res) => {
     console.log("inside login function");
     const { username, password } = req.body
@@ -161,9 +188,11 @@ exports.addFriendsAPI = async (req, res) => {
 
     const userId = req.payload;
     const friendId = req.params.fid;
+    let fimg=null
 
     try {
         const user = await users.findById(userId);
+        
         const friend = await users.findOne({ _id: friendId });
 
         if (!user || !friend) {
@@ -171,6 +200,7 @@ exports.addFriendsAPI = async (req, res) => {
         }
 
         // Check if the friend is already in the user's friends list
+        fimg=friend.profileImage
         const isFriendAlreadyAdded = user.friends.some(
             (friendItem) => friendItem.fid.toString() === friend._id.toString()
         );
@@ -180,7 +210,7 @@ exports.addFriendsAPI = async (req, res) => {
         }
 
         // Add the friend to the user's friends list
-        user.friends.push({ fid: friend._id, fname: friend.username });
+        user.friends.push({ fid: friend._id, fname: friend.username,fimg:fimg });
         await user.save();
 
         const updatedUser = await users.findById(userId);
@@ -319,30 +349,12 @@ exports.friendcount = async (req, res) => {
     }
 };
 
-// exports.editProfile=async(req,res)=>{
-//     console.log('Inside edit Profile');
-//     const userId=req.payload
-//     console.log(req.body);
-//     const {firstName,email,username,password,friends} = req.body
-    
 
-//     // const uploadImage=req.file?req.file.filename:projectImage
-//     try { 
-//         const updatedProfile=await users.findByIdAndUpdate({_id:userId},{firstName, email, username, password, friends },{new:true})
-
-//         console.log('inside success');
-//         res.status(200).json(updatedProfile)
-//     } catch (err) {
-//         console.log('faile');
-//         res.status(401).json(err)
-//     }
-// }
 exports.editProfile = async (req, res) => {
     console.log('Inside edit Profile');
     const userId = req.payload;
     console.log(req.body);
     const { firstName, email, username, password, friends } = req.body;
-    let previousUsername=null
 
     try {
         
@@ -351,26 +363,42 @@ exports.editProfile = async (req, res) => {
             { userId: userId },
             { $set: { username: username } }
         );
+        console.log("post sec completed");
 //fav fav owner
         const updatedFavposts = await Favouriteup.updateMany(
             { userId: userId },
             { $set: { username: username } }
         );
+        console.log("fav sec completed");
+
 //fav post owner
         const updatedFavposters = await Favouriteup.updateMany(
             { posterId: userId },
             { $set: { poster: username } }
         );
+        console.log("fav2 sec completed");
 
         const updatedComments = await comments.updateMany(
             { userId: userId },
             { $set: { username: username } }
         );
+        console.log("comm sec completed");
 
-        const updatedFriends = await users.friends.updateMany(
-            { fid: userId },
-            { $set: { fname: username } }
+        const updatedFriends = await users.updateMany(
+            { 'friends.fid': userId },
+            { $set: { 'friends.$.fname': username } }
         );
+        console.log("frnd sec completed");
+
+        const updatedflag = await flags.updateMany(
+            { posterId: userId },
+            { $set: { poster: username } }
+        );
+        const updatedflag2 = await flags.updateMany(
+            { reporterId: userId },
+            { $set: { reporter: username } }
+        );
+
         // Update user model
         const updatedProfile = await users.findByIdAndUpdate(
             { _id: userId },
@@ -385,3 +413,33 @@ exports.editProfile = async (req, res) => {
         res.status(401).json(err);
     }
 };
+
+
+
+exports.updateprofilepic=async (req,res)=>{ 
+    console.log('inside prof-pic update fn');
+    console.log(req.payload);
+    const userId=req.payload
+    const profileImage=req.file.filename
+    console.log(profileImage);
+    try {
+        const user=await users.findById(userId)
+        console.log(user);
+        console.log("final step");
+        const result=await users.findByIdAndUpdate({_id:userId},
+            {
+                $set:{
+                    profileImage:profileImage
+                }
+            }
+        )
+        await result.save();
+        console.log(result);
+        res.status(200).json(result)
+    } catch (err) {
+        console.log("failure");
+        res.status(500).json(err)
+        
+    }
+
+}
