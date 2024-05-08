@@ -81,7 +81,10 @@ router.put("/edit-profile",jwtMiddleware,userController.editProfile);
 
 router.get("/adminsearch-post/:pid",jwtMiddleware,postController.adminUserPosts)
 
-router.post('/manage-likes:pid',jwtMiddleware,postController.managelikes)
+router.post('/manage-likes',jwtMiddleware,postController.managelikes)
+
+router.post('/dlt-likes',jwtMiddleware,postController.dltlikes)
+
 
 router.get('/doespostexist/:pid', jwtMiddleware, postController.doespostexist);
 

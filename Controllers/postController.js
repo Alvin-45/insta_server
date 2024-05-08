@@ -209,31 +209,144 @@ exports.adminUserPosts = async (req,res)=>{
 }
 
 
-exports.managelikes=async(req,res)=>{
+// exports.managelikes=async(req,res)=>{
+//     console.log('Inside manage likes Request');
+//     console.log(req.payload);
+//     console.log(req.body);
+//     const userId = req.payload;
+//     const {postId} = req.body;
+//     let username=null;
+//     console.log(postId);
+//     try {
+//         const user = await users.findById(userId);
+//         if (user) {
+//             console.log('inside iif');
+//             username=user.username
+
+//             console.log(username);
+//             const updatedlike=await posts.findByIdAndUpdate({_id:postId},
+//             {
+//                 $addToSet:{
+//                     likes:{lid:userId,
+//                         lname:username
+//                     }
+//                 }
+//             },{new:true}
+//         )
+//         res.status(200).json(updatedlike)
+//         }
+        
+//     } catch (err) {
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+
+// }
+
+exports.managelikes = async (req, res) => {
     console.log('Inside manage likes Request');
-
+    console.log(req.payload);
+    console.log(req.body);
     const userId = req.payload;
-    const postId = req.params.pid;
-    const username=null;
-
+    const { postId } = req.body;
+    let username = null;
+    console.log(postId);
     try {
         const user = await users.findById(userId);
         if (user) {
-            username=user.username
-            const updatedlike=await users.findByIdAndUpdate({_id:postId},
-            {
-                $push:{
-                    likes:{lid:''}
-                }
-            })
+            console.log('inside if');
+            username = user.username;
 
+            console.log(username);
+            const post = await posts.findById(postId);
+            if (!post) {
+                return res.status(404).json({ error: 'Post not found' });
+            }
+
+            const existingLike = post.likes.find(like => like.lid.toString() === userId.toString());
+            if (existingLike) {
+                return res.status(400).json({ error: 'You have already liked this post' });
+            }
+
+            const updatedLike = await posts.findByIdAndUpdate(
+                { _id: postId },
+                {
+                    $addToSet: {
+                        likes: {
+                            lid: userId,
+                            lname: username
+                        }
+                    }
+                },
+                { new: true }
+            );
+            res.status(200).json(updatedLike);
+        } else {
+            res.status(404).json({ error: 'User not found' });
         }
-        
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
-
 }
+
+exports.dltlikes = async (req, res) => {
+    console.log('Inside dlt likes Request');
+    console.log(req.payload);
+    console.log(req.body);
+    const userId = req.payload;
+    const { postId } = req.body;
+    console.log(postId);
+    try {
+        const existingPost = await posts.findById(postId);
+        const { likes } = existingPost;
+        const likeIndex = likes.findIndex(like => like.lid ===userId);
+        if (likeIndex !== -1) {
+            existingPost.likes.splice(likeIndex, 1);
+            const updatedPost = await existingPost.save();
+            res.status(200).json({ message: 'Like removed successfully', updatedPost });
+        } else {
+            res.status(404).json({ error: 'Like not found' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+// exports.managelikes = async (req, res) => {
+//     console.log('Inside manage likes Request');
+
+//     const userId = req.payload;
+//     const { postId } = req.body;
+
+//     try {
+//         const user = await users.findById(userId);
+//         if (!user) {
+//             return res.status(404).json({ error: 'User not found' });
+//         }
+
+//         const existingPost = await posts.findById(postId);
+//         if (!existingPost) {
+//             return res.status(404).json({ error: 'Post not found' });
+//         }
+
+//         const { likes } = existingPost;
+//         const likeIndex = likes.findIndex(like => like.lid === userId);
+//         if (likeIndex !== -1) {
+//             // User's like already exists, remove it
+//             existingPost.likes.splice(likeIndex, 1);
+//         } else {
+//             // User's like doesn't exist, add it
+//             existingPost.likes.push({ lid: userId, lname: user.username });
+//         }
+
+//         const updatedPost = await existingPost.save();
+//         res.status(200).json({ message: 'Like managed successfully', updatedPost });
+//     } catch (err) {
+//         console.error(err);
+//         res.status(500).json({ error: 'Internal Server Error' });
+//     }
+// };
 
 exports.doespostexist=async (req,res)=>{
     console.log('Inside does post exist request!!!');
