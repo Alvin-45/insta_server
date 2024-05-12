@@ -299,12 +299,12 @@ exports.removeFriend = async (req, res) => {
 }
 
 exports.luserdetail = async (req, res) => {
-    console.log("Inside luser friend");
+    // console.log("Inside luser friend");
     const userId=req.payload
-    console.log(userId);
+    // console.log(userId);
     try {
         const currentUser = await users.findOne({_id:userId});
-        console.log(currentUser);
+        // console.log(currentUser);
         res.status(200).json(currentUser);
     } catch (err) {
         res.status(401).json(err);
@@ -442,4 +442,38 @@ exports.updateprofilepic=async (req,res)=>{
         
     }
 
+}
+
+exports.searchfriendcount = async (req, res) => {
+    console.log('Inside friend count for search');
+    console.log(req.params);
+    const userId = req.params.uid;
+    let username = null;
+    try {
+        console.log('inside try');
+        const user = await users.findById(userId);
+        console.log(user);
+        username = user.username;
+        console.log(username);
+        const friendList = await users.aggregate([
+            { $match: { friends: { $elemMatch: { fid: userId, fname: username } } } }
+        ]);
+
+        console.log(friendList);
+        res.status(200).json(friendList);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+};
+
+exports.deleteUser=async (req,res)=>{
+    console.log(req.body)
+    const {userId}=req.body
+    try {
+        const result3=await comments.findByIdAndDelete({posterId:userId})
+        const result2=await posts.findByIdAndDelete({userId:userId})
+        const result=await users.findByIdAndDelete(userId)
+    } catch (err) {
+        res.status(401).json(err)
+    }
 }

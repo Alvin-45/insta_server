@@ -85,6 +85,8 @@ router.post('/manage-likes',jwtMiddleware,postController.managelikes)
 
 router.post('/dlt-likes',jwtMiddleware,postController.dltlikes)
 
+router.post('/dlt-fav',jwtMiddleware,postController.dltfav)
+
 
 router.get('/doespostexist/:pid', jwtMiddleware, postController.doespostexist);
 
@@ -95,6 +97,9 @@ router.put("/edit-comment/:cid",jwtMiddleware,commentControler.editComment)
 router.get('/isfav/:pid',jwtMiddleware,postController.isfav)
 
 router.get('/frndcount',jwtMiddleware,userController.friendcount)
+
+router.get('/searchfrndcount/:uid',jwtMiddleware,userController.searchfriendcount)
+
 
 router.get('/getallfav',jwtMiddleware,multerConfig.single('profileimage'),postController.getAllfav)
 

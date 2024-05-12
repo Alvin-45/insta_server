@@ -25,6 +25,12 @@ const postSchema = new mongoose.Schema({
           lname: { type: String }
         }
       ],
+      fav: [
+        {
+          fid: { type: String },
+          fname: { type: String }
+        }
+      ]
       
 })
 
