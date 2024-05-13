@@ -107,5 +107,6 @@ router.get('/getflagcmt',jwtMiddleware,commentControler.getflagComment)
 
 router.put("/profile-pic",jwtMiddleware,multerConfig.single('profileImage'),userController.updateprofilepic)
 
+router.delete("/dlt-user",jwtMiddleware,userController.deleteUser)
 
 module.exports = router

@@ -18,16 +18,18 @@ exports.addcommentsAPI = async (req, res) => {
 
   const userId = req.payload;
   let username = null;
-
+  let profileImage=null
   try {
     const user = await users.findById(userId);
     if (user) {
       username = user.username;
+      profileImage=user.profileImage
       const newComment = new comments({
         comment,
         userId,
         postId,
-        username
+        username,
+        profileImage
       });
       await newComment.save();
       res.status(200).json(newComment);

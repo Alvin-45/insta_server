@@ -16,7 +16,10 @@ const commentSchema=new mongoose.Schema({
     username:{
         type:String,
         required:true
-    }
+    },
+    profileImage:{
+        type:String
+      }
 })
 const comments=mongoose.model("comments",commentSchema)
 module.exports=comments

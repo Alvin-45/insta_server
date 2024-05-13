@@ -6,7 +6,8 @@ const jwt = require('jsonwebtoken')
 const Favouriteup=require('../Model/FavUpdatedModel')
 const admins = require('../Model/adminModel')
 const flags=require('../Model/flagModel')
-const flagscomments = require('../Model/flagcomment')
+const flagscomments = require('../Model/flagcomment');
+const chats = require('../Model/chatModel');
 
 // exports.register = async (req, res) => {
 //     console.log("Inside Register Function");
@@ -467,13 +468,78 @@ exports.searchfriendcount = async (req, res) => {
 };
 
 exports.deleteUser=async (req,res)=>{
+    console.log('Inside dlt user fn');
     console.log(req.body)
     const {userId}=req.body
+    let username=null
     try {
-        const result3=await comments.findByIdAndDelete({posterId:userId})
-        const result2=await posts.findByIdAndDelete({userId:userId})
+        const user=await users.findById(userId)
+        username=user.username
+        console.log(username);
+        const result6=await chats.updateMany({ receiver: username }, { $set: { receiver: 'Sanapgram User' } }) 
+        const result7=await chats.updateMany({ sender: username }, { $set: { sender: 'Sanapgram User' } })
+        console.log('result6 success');
+        const updatedUser = await users.findOneAndUpdate(
+            { 'friends.fid': userId },
+            { $pull: { friends: { fid: userId } } }, 
+            { new: true } // Return the updated document
+        );
+        const updatedownfrndUser = await users.findOneAndUpdate(
+            { _id: userId },
+            { $set: { friends: [] } }, 
+            { new: true } // Return the updated document
+        );
+        console.log('update user success');
+
+        const result4=await Favouriteup.deleteMany({userId:userId})
+        console.log('result4 success');
+
+        const updatfavpost=await Favouriteup.deleteMany({posterId:userId})
+
+        const updatedpostfavUser = await posts.findOneAndUpdate(
+            { 'fav.fid': userId },
+            { $pull: { fav: { fid: userId } } }, 
+            { new: true } // Return the updated document
+        );
+        console.log('updatefav success');
+        const updatedlike = await posts.updateMany(
+            { 'likes.lid': userId },
+            { $pull: { likes: { lid: userId } } }, 
+            { new: true } // Return the updated document
+        );//success
+        console.log(updatedlike);
+
+        const result5=await flags.deleteMany({posterId:userId})
+        console.log('result5 success');
+
+        const result3=await comments.deleteMany({userId:userId})
+        console.log('result3 success');
+
+        const result2=await posts.deleteMany({userId:userId})
+        console.log('result2 success');
+
         const result=await users.findByIdAndDelete(userId)
+        res.status(200).json(result)
     } catch (err) {
         res.status(401).json(err)
     }
 }
+
+// exports.deleteUser=async (req,res)=>{
+//     console.log('Inside dlt user fn');
+//     console.log(req.body)
+//     const {userId}=req.body
+//     let username=null
+//     try {
+        
+//         const updatedlike = await posts.updateMany(
+//             { 'likes.lid': userId },
+//             { $pull: { likes: { lid: userId } } }, 
+//             { new: true } // Return the updated document
+//         );//success
+//         console.log(updatedlike);
+//         res.status(200).json(updatedlike)
+//     } catch (err) {
+//         res.status(401).json(err)
+//     }
+// }
