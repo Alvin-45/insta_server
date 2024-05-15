@@ -19,6 +19,7 @@ exports.addcommentsAPI = async (req, res) => {
   const userId = req.payload;
   let username = null;
   let profileImage=null
+  
   try {
     const user = await users.findById(userId);
     if (user) {

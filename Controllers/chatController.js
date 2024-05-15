@@ -1,6 +1,9 @@
 const chats=require('../Model/chatModel')
 const jwt = require('jsonwebtoken')
 const users = require('../Model/userModel');
+const { format } = require('date-fns');
+
+
 
 exports.addchatsAPI = async (req, res) => {
     console.log('Inside Add chat message Request');
@@ -11,13 +14,17 @@ exports.addchatsAPI = async (req, res) => {
     const { chatmessage } = req.body;
     const receiver = req.params.rid; 
     const sender = req.params.sid;
+    let time=null
     
     try {
-      
+        const formatTimestamp = (timestamp) => format(new Date(timestamp), 'HH:mm');
+        time=formatTimestamp(Date.now())
+        console.log(time);
         const newChat = new chats({
             sender,
             receiver,
-            chatmessage
+            chatmessage,
+            time
         });
         await newChat.save();
         res.status(200).json(newChat);

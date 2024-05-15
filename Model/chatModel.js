@@ -12,6 +12,10 @@ const chatSchema=mongoose.Schema({
     chatmessage:{
         type:String,
         required:true
+    },
+    time:{
+        type:String,
+        required:true
     }
 })
 
