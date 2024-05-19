@@ -545,7 +545,8 @@ exports.deleteUser=async (req,res)=>{
 // }
 
 exports.connectionAPI=async(req,res)=>{
-    console.log(req)
+    console.log('Inside connection fn');
+    // console.log(req)
     try {
         const user=await users.find()
         if(user){
