@@ -109,4 +109,6 @@ router.put("/profile-pic",jwtMiddleware,multerConfig.single('profileImage'),user
 
 router.delete("/dlt-user",jwtMiddleware,userController.deleteUser)
 
+router.get("/connection",userController.connectionAPI)
+
 module.exports = router

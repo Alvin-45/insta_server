@@ -543,3 +543,17 @@ exports.deleteUser=async (req,res)=>{
 //         res.status(401).json(err)
 //     }
 // }
+
+exports.connectionAPI=async(req,res)=>{
+    console.log(req)
+    try {
+        const user=await users.find()
+        if(user){
+        res.status(200).json(user)
+    }
+    } catch (error) {
+        res.status(404).json(error)
+    }
+    
+    
+}
