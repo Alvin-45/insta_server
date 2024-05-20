@@ -6,6 +6,7 @@ const flags=require('../Model/flagModel')
 const admindeleted=require('../Model/admindeletedmodel')
 const flagcomment=require('../Model/flagcomment')
 const Favouriteup=require('../Model/FavUpdatedModel')
+const comments = require('../Model/commentModel')
 
 exports.register = async (req, res) => {
     console.log("Inside Register Function");
@@ -101,9 +102,13 @@ exports.deletedposts = async (req, res) => {
 exports.removecmtflag=async(req,res)=>{
     console.log("Inside Remove cmt flag");
     const {cid}=req.params;
+    console.log(cid);
     try {
+        const postDetails2=await comments.findByIdAndDelete(cid)
         const postDetails=await flagcomment.findOneAndDelete({commentId:cid})
-        res.status(200).json(postDetails)
+        
+
+        res.status(200).json(postDetails2)
     } catch (err) {
         res.status(401).json(err)
     }
