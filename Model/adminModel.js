@@ -13,7 +13,14 @@ const adminSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
-  }
+  },
+  friends: [
+    {
+      fid: { type: String },
+      fname: { type: String },
+      fimg:{ type: String }
+    }
+  ]
 });
 
 const admins = mongoose.model('admin', adminSchema);

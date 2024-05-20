@@ -255,6 +255,53 @@ exports.managelikes = async (req, res) => {
     }
 }
 
+exports.manageadminlikes = async (req, res) => {
+    console.log('Inside manage admin likes Request');
+    console.log(req.payload);
+    console.log(req.body);
+    const userId = req.payload;
+    const { postId } = req.body;
+    let username = null;
+    console.log(postId);
+    try {
+        const user = await admins.findById(userId);
+        if (user) {
+            console.log('inside if');
+            username = user.firstName;
+
+            console.log(username);
+            const post = await posts.findById(postId);
+            if (!post) {
+                return res.status(404).json({ error: 'Post not found' });
+            }
+
+            const existingLike = post.likes.find(like => like.lid.toString() === userId.toString());
+            if (existingLike) {
+                return res.status(400).json({ error: 'You have already liked this post' });
+            }
+
+            const updatedLike = await posts.findByIdAndUpdate(
+                { _id: postId },
+                {
+                    $addToSet: {
+                        likes: {
+                            lid: userId,
+                            lname: username
+                        }
+                    }
+                },
+                { new: true }
+            );
+            res.status(200).json(updatedLike);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
 exports.dltlikes = async (req, res) => {
     console.log('Inside dlt likes Request');
     console.log(req.payload);
@@ -344,6 +391,60 @@ exports.addfavPost = async (req, res) => {
         if (user) {
             console.log('inside if');
             username = user.username;
+
+            console.log(username);
+            const post = await posts.findById(postId);
+            if (!post) {
+                return res.status(404).json({ error: 'Post not found' });
+            }
+            posterId=post.userId
+            
+            const existingFav = post.fav.find(fav => fav.fid.toString() === userId.toString());
+            if (existingFav) {
+                return res.status(400).json({ error: 'You have already liked this post' });
+            }
+            const newFavourite = new Favouriteup({
+                userId,username,posterId, poster, postId, postCaption,postImage
+            });
+            console.log(newFavourite);
+            await newFavourite.save();
+
+            const updatedfav = await posts.findByIdAndUpdate(
+                { _id: postId },
+                {
+                    $addToSet: {
+                        fav: {
+                            fid: userId,
+                            fname: username
+                        }
+                    }
+                },
+                { new: true }
+            );
+            res.status(200).json(updatedfav);
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+exports.addadminfavPost = async (req, res) => {
+    console.log('Inside manage fav Request');
+    console.log(req.payload);
+    console.log(req.body);
+    const userId = req.payload;
+    const {poster,postId,postCaption,postImage}  = req.body;
+    let username = null;
+    let posterId=null
+    console.log(postId);
+    try {
+        const user = await admins.findById(userId);
+        if (user) {
+            console.log('inside if');
+            username = user.firstName;
 
             console.log(username);
             const post = await posts.findById(postId);

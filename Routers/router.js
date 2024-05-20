@@ -31,11 +31,16 @@ router.post("/flag-post/:pid/:pc",jwtMiddleware,postController.addflagPost)
 
 router.post("/fav-post",jwtMiddleware,postController.addfavPost)
 
+router.post("/adminfav-post",jwtMiddleware,postController.addadminfavPost)
+
 router.post('/add-comment/:pid',jwtMiddleware,commentControler.addcommentsAPI)
 
 router.post('/add-admindeleted/:poster/:postId/:postCaption/:reporter',jwtMiddleware,commentControler.addcommentsAPI)
 
 router.post('/add-friend/:fid',jwtMiddleware,userController.addFriendsAPI)
+
+router.post('/add-mark/:fid',jwtMiddleware,userController.addbookedAPI)
+
 
 router.get('/adminallusers', userController.adminAllUsers);
 
@@ -54,9 +59,12 @@ router.get('/getAllUsers', userController.getUsername);
 
 router.get('/luser', jwtMiddleware, userController.luserdetail);
 
+router.get('/ladmin', jwtMiddleware, userController.ladmindetail);
 router.get('/isfriend/:fid',jwtMiddleware,userController.isFriendAPI)
 
 router.get("/friendspage",jwtMiddleware,userController.getAllFriends)
+router.get("/bookedpage",jwtMiddleware,userController.getAllBooked)
+
 
 router.get("/frienddetails/:uid",userController.allfrienddetails)
 
@@ -70,6 +78,8 @@ router.delete("/remove-cmtflag/:cid",jwtMiddleware,adminController.removecmtflag
 
 router.delete("/remove-friend/:fid",jwtMiddleware,userController.removeFriend)
 
+router.delete("/remove-book/:fid",jwtMiddleware,userController.removebooked)
+
 router.delete("/remove-comment/:cid",jwtMiddleware,commentControler.dltcomment)
 
 //chat part
@@ -82,6 +92,9 @@ router.put("/edit-profile",jwtMiddleware,userController.editProfile);
 router.get("/adminsearch-post/:pid",jwtMiddleware,postController.adminUserPosts)
 
 router.post('/manage-likes',jwtMiddleware,postController.managelikes)
+
+router.post('/manage-adminlikes',jwtMiddleware,postController.manageadminlikes)
+
 
 router.post('/dlt-likes',jwtMiddleware,postController.dltlikes)
 

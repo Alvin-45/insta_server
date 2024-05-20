@@ -311,7 +311,18 @@ exports.luserdetail = async (req, res) => {
         res.status(401).json(err);
     }
 }
-
+exports.ladmindetail = async (req, res) => {
+    // console.log("Inside luser friend");
+    const userId=req.payload
+    // console.log(userId);
+    try {
+        const currentUser = await admins.findOne({_id:userId});
+        // console.log(currentUser);
+        res.status(200).json(currentUser);
+    } catch (err) {
+        res.status(401).json(err);
+    }
+}
 
 // exports.friendcount=async(req,res)=>{
 //     console.log('Inside frnt count');
@@ -545,7 +556,7 @@ exports.deleteUser=async (req,res)=>{
 // }
 
 exports.connectionAPI=async(req,res)=>{
-    console.log('Inside connection fn');
+    // console.log('Inside connection fn');
     // console.log(req)
     try {
         const user=await users.find()
@@ -558,3 +569,81 @@ exports.connectionAPI=async(req,res)=>{
     
     
 }
+
+exports.addbookedAPI = async (req, res) => {
+    console.log('Inside Add suspesious Request');
+
+    const userId = req.payload;
+    const friendId = req.params.fid;
+    let fimg=null
+    try {
+        const user = await admins.findById(userId);
+        
+        const friend = await users.findOne({ _id: friendId });
+
+        if (!user || !friend) {
+            return res.status(404).json({ error: 'User or friend not found' });
+        }
+
+        // Check if the friend is already in the user's friends list
+        fimg=friend.profileImage
+        
+        const isFriendAlreadyAdded = user.friends.some(
+            (friendItem) => friendItem.fid.toString() === friend._id.toString()
+        );
+        
+
+        if (isFriendAlreadyAdded) {
+            return res.status(400).json({ error: 'Friend already added' });
+        }
+
+        // Add the friend to the user's friends list
+        user.friends.push({ fid: friend._id, fname: friend.username,fimg:fimg });
+        await user.save();
+
+        const updatedUser = await admins.findById(userId);
+        res.status(200).json(updatedUser);
+        console.log(updatedUser);
+    } catch (err) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+exports.removebooked = async (req, res) => {
+    console.log("Inside Remove friend");
+    console.log(req.payload);
+    const userId = req.payload;
+    const fid = req.params.fid;
+    console.log(fid);
+    try {
+        const updatedUser = await admins.findOneAndUpdate(
+            { _id: userId },
+            { $pull: { friends: { fid: fid } } }, 
+            { new: true } // Return the updated document
+        );
+        console.log(updatedUser);
+        res.status(200).json(updatedUser);
+    } catch (err) {
+        res.status(401).json(err);
+    }
+}
+
+exports.getAllBooked = async (req, res) => {
+    console.log("Inside getAllFriends request");
+    const userId = req.payload;
+
+    try {
+        const user = await admins.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const friendsList = user.friends;
+        res.status(200).json(friendsList);
+        // console.log(friendsList);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+        console.log('Error fetching friends!!!');
+    }
+};
